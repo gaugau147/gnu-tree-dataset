@@ -32,7 +32,7 @@ class Tree:
         if current_depth == 2:
             self.tree.append(path)
         else:
-            for f in sorted(os.listdir(path)):
+            for f in sorted([f for f in os.listdir(path) if os.path.isdir(os.path.join(path, f))]):
                 self.create_folder_tree(os.path.join(path, f), current_depth - 1)
     
     def get_tree(self):
@@ -44,74 +44,74 @@ class Tree:
         return self.tree
 
 
-def compare_batch(jsonPath, imagePath, save_dir):
+def compare_batch(jsonPath, imagePath, save_dir, writer):
     '''
-    input:  jsonPath (str) 'labelled/exit/batch1'
-            imagePath(str) 'raw/batch1'
+    input:  jsonPath (str) 'labelled/exit/../batch1'
+            imagePath(str) 'raw/../batch1'
             save_dir (str) 'test'
     '''
 
     jsonCams = sorted([f for f in os.listdir(jsonPath) if os.path.isdir(os.path.join(jsonPath, f))])
-    
 
-    # path_to_save = os.path.join(save_dir, os.path.join(*imagePath.split(os.sep)[1:]))
-    # if not os.path.exists(path_to_save):
-    #     os.makedirs(path_to_save)
+    for cam in jsonCams:
+        json_list = []
+        image_list = []
+        # json_list = sorted([os.path.splitext(f)[0] for f in os.listdir(os.path.join(jsonPath, cam))])
+        # image_list = sorted([os.path.splitext(f)[0] for f in os.listdir(os.path.join(imagePath, cam))])
+        for f in sorted(os.listdir(os.path.join(jsonPath, cam))):
+            json_list.append(os.path.splitext(f)[0])
+            source_extension = os.path.splitext(f)[1]
 
-    if os.path.exists(os.path.join(jsonPath, '_'.join(jsonPath.split(os.sep)) + '.csv')):
-        os.remove(os.path.join(jsonPath, '_'.join(jsonPath.split(os.sep)) + '.csv'))
+        if cam not in os.listdir(imagePath):
+            continue
+            
+        for f in sorted(os.listdir(os.path.join(imagePath, cam))):
+            image_list.append(os.path.splitext(f)[0])
+            dest_extension = os.path.splitext(f)[1]
 
-    with open(os.path.join(jsonPath, '_'.join(jsonPath.split(os.sep)) + '.csv'), 'w', newline='') as csvfile:
-        fieldnames = ['path', 'status']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+        path_to_save = os.path.join(save_dir, os.path.join(*jsonPath.split(os.sep)[1:]), cam)
+        if not os.path.exists(path_to_save):
+            os.makedirs(path_to_save)
 
-        for cam in jsonCams:
-            json_list = sorted([os.path.splitext(f)[0] for f in os.listdir(os.path.join(jsonPath, cam))])
-            image_list = sorted([os.path.splitext(f)[0] for f in os.listdir(os.path.join(imagePath, cam))])
-
-            path_to_save = os.path.join(save_dir, os.path.join(*jsonPath.split(os.sep)[1:]), cam)
-            if not os.path.exists(path_to_save):
-                os.makedirs(path_to_save)
-
-            if json_list == image_list:
-                for f in json_list:
-                    shutil.copy(os.path.join(imagePath, cam, f + '.jpeg'), os.path.join(path_to_save, f + '.jpeg'))
-
+        if json_list == image_list:
             for f in json_list:
-                # cams = os.listdir(os.path.join(jsonPath, f))
-                if f not in image_list:
-                    # print('not in image folder: ', os.path.join(jsonPath, f))
-                    writer.writerow({
-                        'path': os.path.join(jsonPath, cam, f + '.json'),
-                        'status': 'missing image'
-                    })
-                else:
-                    shutil.copy(os.path.join(imagePath, cam, f + '.jpeg'), os.path.join(path_to_save, f + '.jpeg'))
+                shutil.copy(os.path.join(imagePath, cam, f + dest_extension), os.path.join(path_to_save, f + dest_extension))
+
+        for f in json_list:
+            if f not in image_list:
+                writer.writerow({
+                    'missing correspoding file in source': os.path.join(jsonPath, cam, f + source_extension)
+                })
+            else:
+                shutil.copy(os.path.join(imagePath, cam, f + dest_extension), os.path.join(path_to_save, f + dest_extension))
 
         
 
 
 if __name__ == "__main__":
-    # dirs = [d for d in os.listdir('.' if os.path.isdir(x))]
     parser = argparse.ArgumentParser()
-    parser.add_argument('-json_root', type=str, required=True, help='json root name')
-    parser.add_argument('-jpeg_root', type=str, required=True, help='jpeg root name')
+    parser.add_argument('-source', type=str, required=True, help='json root name')
+    parser.add_argument('-dest', type=str, required=True, help='jpeg root name')
     parser.add_argument('-save_dir', type=str, default='test', help='where to save available images')
     args = parser.parse_args()
 
-    json = Tree(args.json_root)
-    jpeg = Tree(args.jpeg_root)
+    source = Tree(args.source)
+    dest = Tree(args.dest)
 
-    print('json tree: ', json.get_batch_list())
-    print('jpeg tree: ', jpeg.get_batch_list())
+    print('json tree: ', source.get_batch_list())
+    print('jpeg tree: ', dest.get_batch_list())
 
     if os.path.exists(args.save_dir):
         shutil.rmtree(args.save_dir)
     
     os.makedirs(args.save_dir)
 
-    
-    for i in range(len(json.get_batch_list())):
-        compare_batch(json.get_batch_list()[i], jpeg.get_batch_list()[i], args.save_dir)
-        # pass
+    if os.path.exists(os.path.join(args.source, 'results.csv')):
+        os.remove(os.path.join(args.source, 'results.csv'))
+
+    with open(os.path.join(args.source, 'results.csv'), 'w') as csvfile:
+        fieldnames = ['missing correspoding file in source']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in range(len(source.get_batch_list())):
+            compare_batch(source.get_batch_list()[i], dest.get_batch_list()[i], args.save_dir, writer)
