@@ -1,0 +1,91 @@
+.
+├── labelled
+│   ├── exit
+│   │   ├── batch1
+│   │   │   ├── cam0
+│   │   │   │   └── test01.json
+│   │   │   ├── cam1
+│   │   │   │   └── test01.json
+│   │   │   ├── cam2
+│   │   │   │   ├── test01.json
+│   │   │   │   └── test02.json
+│   │   │   └── labelled_exit_batch1.csv
+│   │   └── batch2
+│   │       ├── cam0
+│   │       │   └── test02.json
+│   │       ├── cam1
+│   │       │   ├── test01.json
+│   │       │   └── test02.json
+│   │       └── labelled_exit_batch2.csv
+│   └── highway
+│       ├── batch3
+│       │   ├── cam0
+│       │   │   └── test01.json
+│       │   ├── cam1
+│       │   └── labelled_highway_batch3.csv
+│       └── batch4
+│           ├── cam0
+│           │   └── test02.json
+│           ├── cam1
+│           │   ├── test01.json
+│           │   └── test04.json
+│           └── labelled_highway_batch4.csv
+├── raw
+│   ├── batch1
+│   │   ├── cam0
+│   │   │   ├── test01.jpeg
+│   │   │   └── test02.jpeg
+│   │   ├── cam1
+│   │   │   ├── test01.jpeg
+│   │   │   └── test02.jpeg
+│   │   └── cam2
+│   │       ├── test02.jpeg
+│   │       └── test03.jpeg
+│   ├── batch2
+│   │   ├── cam0
+│   │   │   ├── test02.jpeg
+│   │   │   └── test03.jpeg
+│   │   └── cam1
+│   │       ├── test02.jpeg
+│   │       └── test03.jpeg
+│   ├── batch3
+│   │   ├── cam0
+│   │   │   └── test01.jpeg
+│   │   └── cam1
+│   │       └── test02.jpeg
+│   └── batch4
+│       ├── cam0
+│       │   └── test01.jpeg
+│       ├── cam1
+│       │   ├── test02.jpeg
+│       │   └── test04.jpeg
+│       └── cam2
+│           └── test01.jpeg
+├── test
+│   ├── exit
+│   │   ├── batch1
+│   │   │   ├── cam0
+│   │   │   │   └── test01.jpeg
+│   │   │   ├── cam1
+│   │   │   │   └── test01.jpeg
+│   │   │   └── cam2
+│   │   │       └── test02.jpeg
+│   │   └── batch2
+│   │       ├── cam0
+│   │       │   └── test02.jpeg
+│   │       └── cam1
+│   │           └── test02.jpeg
+│   └── highway
+│       ├── batch3
+│       │   ├── cam0
+│       │   │   └── test01.jpeg
+│       │   └── cam1
+│       └── batch4
+│           ├── cam0
+│           └── cam1
+│               └── test04.jpeg
+├── Tree.png
+├── tree.txt
+└── walking_tree.py
+
+47 directories, 41 files
