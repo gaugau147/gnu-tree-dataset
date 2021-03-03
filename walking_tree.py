@@ -43,6 +43,9 @@ class Tree:
     def get_batch_list(self):
         return self.tree
 
+    def get_children(self):
+        return [f for f in os.listdir(self.root) if os.path.isdir(os.path.join(self.root, f))]
+
 
 def compare_batch(jsonPath, imagePath, save_dir, writer):
     '''
@@ -98,8 +101,28 @@ if __name__ == "__main__":
     source = Tree(args.source)
     dest = Tree(args.dest)
 
-    print('json tree: ', source.get_batch_list())
-    print('jpeg tree: ', dest.get_batch_list())
+    # print('source paths: ', source.get_batch_list())
+    # print('dest paths: ', dest.get_batch_list())
+
+    print("source's children: ", source.get_children())
+
+    inChildren = True
+    folders = []
+    while True:
+
+        folders = input('Please specify which children folders for checking (please use comma or space): ')
+        folders = folders.split()
+        for c in folders:
+            if c not in source.get_children():
+                print("There are folders in not source's children.")
+                inChildren = False
+        if not inChildren:
+            inChildren = True
+            continue
+        check = input('Checking folders: ' +  str(folders) + ', (y or n)?: ')
+        
+        if check in ' y Y yes Yes YES YEs ':
+            break
 
     if os.path.exists(args.save_dir):
         shutil.rmtree(args.save_dir)
@@ -114,4 +137,7 @@ if __name__ == "__main__":
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for i in range(len(source.get_batch_list())):
-            compare_batch(source.get_batch_list()[i], dest.get_batch_list()[i], args.save_dir, writer)
+            child = source.get_batch_list()[i].split(os.sep)[1]
+            # print(child)
+            if child in folders:
+                compare_batch(source.get_batch_list()[i], dest.get_batch_list()[i], args.save_dir, writer)
