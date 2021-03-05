@@ -110,7 +110,7 @@ if __name__ == "__main__":
     folders = []
     while True:
 
-        folders = input('Please specify which children folders for checking (please use comma or space): ')
+        folders = input('Please specify which children folders for checking (please use space only): ')
         folders = folders.split()
         for c in folders:
             if c not in source.get_children():
